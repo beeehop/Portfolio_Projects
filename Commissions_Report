@@ -1,4 +1,4 @@
--- SR Dir 2022 Q1
+-- SR Director Horizon II FIT 2022 Q1
 
 -- Variables 
 SET NOCOUNT ON
@@ -94,9 +94,9 @@ ON cust.slspsn_no_2 = rep.slspsn_no
 
 WHERE qtr IN (@currentqtr)
 AND commissionable IN ('Y')
-AND GroupForecast LIKE '%GEL%'
+AND (GroupForecast LIKE '%GEL%'
 OR GroupForecast IN ('KITS MIGS')
-OR item.GroupForecast IN ('CES ALEXIS TROCAR')
+OR item.GroupForecast IN ('CES ALEXIS TROCAR'))
 
 UNION ALL 
 
@@ -124,9 +124,9 @@ ON cust.slspsn_no_2 = rep.slspsn_no
 
 WHERE qtr IN (@currentqtr)
 AND commissionable IN ('Y')
-AND item.GroupForecast LIKE '%GEL%'
+AND (item.GroupForecast LIKE '%GEL%'
 OR item.GroupForecast IN ('KITS MIGS')
-OR item.GroupForecast IN ('CES ALEXIS TROCAR')
+OR item.GroupForecast IN ('CES ALEXIS TROCAR'))
 
 ),
 
@@ -217,12 +217,12 @@ SELECT
     m.zone, 
     m.region, 
 
-        ROUND(SUM(netrev*
+        SUM(netrev*
         (CASE 
         WHEN qtr IN (@currentqtr)
-        THEN 1 ELSE 0 END)),0) 
+        THEN 1 ELSE 0 END))
     AS CurrentRev, 
-        ROUND((SUM(netrev*
+        (SUM(netrev*
         (CASE 
         WHEN qtr IN (@currentqtr)
         AND USER_NAME NOT IN ('TRACE TEAM')
@@ -231,7 +231,7 @@ SELECT
         (CASE
         WHEN qtr IN (@currentqtr)
         AND USER_NAME IN ('TRACE TEAM')
-        THEN 1 ELSE 0 END))),0)
+        THEN 1 ELSE 0 END)))
     AS ProjRev,
     GelRevTarget AS Target
 
